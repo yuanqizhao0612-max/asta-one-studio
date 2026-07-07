@@ -3,8 +3,8 @@ const $ = (id) => document.getElementById(id);
 const FIXED_CARDS = [
   { type: "cover", label: "封面图", fixedTitle: "封面图", fileName: "asta-one-01-cover.png" },
   { type: "first_impression", label: "第一印象", fixedTitle: "第一印象", fileName: "asta-one-02-first-impression.png" },
-  { type: "why_stay", label: "为什么想停留", fixedTitle: "为什么想停留", fileName: "asta-one-03-why-stay.png" },
-  { type: "how_to_experience", label: "建议这样逛", fixedTitle: "建议这样逛", fileName: "asta-one-04-how-to-experience.png" },
+  { type: "hidden_point", label: "隐藏看点", fixedTitle: "隐藏看点", fileName: "asta-one-03-hidden-point.png" },
+  { type: "experience_guide", label: "体验指南", fixedTitle: "体验指南", fileName: "asta-one-04-experience-guide.png" },
   { type: "what_is_good", label: "它好在哪里", fixedTitle: "它好在哪里", fileName: "asta-one-05-what-is-good.png" },
   { type: "suitable_for", label: "适合谁来", fixedTitle: "适合谁来", fileName: "asta-one-06-suitable-for.png" },
 ];
@@ -30,12 +30,18 @@ const DEFAULT_BODIES = ["", "", "", "", "", ""];
 
 const LEGACY_TEMPLATE_BODY_HASHES = new Set([4170533815, 2631844802, 2976450300, 2871188387, 207186632, 1211142902]);
 
+const TITLE_MIGRATION_MAP = {
+  "第一眼感觉": "第一印象",
+  "为什么想停留": "隐藏看点",
+  "建议这样逛": "体验指南",
+};
+
 const BODY_PLACEHOLDERS = {
-  first_impression: "请填写这个地方给你的第一印象，例如空间气质、第一眼看到的场景、进入后的感受。",
-  why_stay: "请填写让人愿意停下来的具体原因，例如座位、光线、动线、气味、人群或节奏。",
-  how_to_experience: "请填写具体体验方法，例如什么时间去、从哪里开始、哪里适合停留。",
-  what_is_good: "请填写你对这个地方的判断，例如它真正打动人的地方和为什么值得被记住。",
-  suitable_for: "请填写适合什么样的人、心情、关系和场景。",
+  first_impression: "请写这个地方给你的第一印象：第一眼看到什么？空间气质是什么？和普通空间有什么不同？",
+  hidden_point: "请写普通游客容易忽略的背景、设计、历史或空间亮点，例如老建筑、设计理念、特殊细节、项目原始意图。",
+  experience_guide: "请写具体体验方法：什么时间去、从哪里开始、先看什么、再去哪、哪里适合停留、拍照或放松。",
+  what_is_good: "请写 ASTA ONE 的判断：这个项目真正好的地方是什么？它为什么值得被体验？它提供了怎样的生活方式？",
+  suitable_for: "请写适合什么样的人、心情、关系和场景，也可以写不适合什么期待。",
 };
 
 const EMPTY_BODY_PREVIEW = "正文待填写";
@@ -76,17 +82,24 @@ function createDefaultSlides() {
 function normalizeSlides(slides) {
   const defaults = createDefaultSlides();
   return defaults.map((base, index) => {
+    const previous = slides?.[index] || {};
+    const migratedTitle = TITLE_MIGRATION_MAP[previous.fixedTitle] || TITLE_MIGRATION_MAP[previous.label] || TITLE_MIGRATION_MAP[previous.title];
     const slide = {
       ...base,
-      ...(slides?.[index] || {}),
+      ...previous,
       step: index + 1,
       type: base.type,
-      label: base.label,
-      fixedTitle: base.fixedTitle,
-      title: index === 0 ? slides?.[index]?.title || base.title : base.fixedTitle,
+      label: migratedTitle || base.label,
+      fixedTitle: migratedTitle || base.fixedTitle,
+      title: index === 0 ? previous.title || base.title : migratedTitle || base.fixedTitle,
     };
     if (index > 0 && LEGACY_TEMPLATE_BODY_HASHES.has(stableTextHash(slide.body))) {
       slide.body = "";
+    }
+    if (index > 0) {
+      slide.label = base.label;
+      slide.fixedTitle = base.fixedTitle;
+      slide.title = base.fixedTitle;
     }
     return slide;
   });

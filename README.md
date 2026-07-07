@@ -15,8 +15,8 @@ ASTA ONE Studio is a static 6-image layout tool for ASTA ONE content.
 
 1. Cover
 2. 第一印象
-3. 为什么想停留
-4. 建议这样逛
+3. 隐藏看点
+4. 体验指南
 5. 它好在哪里
 6. 适合谁来
 
