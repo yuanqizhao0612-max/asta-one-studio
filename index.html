@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ASTA ONE 6图排版器</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <header class="app-header">
+      <div>
+        <div class="brand">ASTA ONE Studio</div>
+        <h1>6图标准化排版器</h1>
+      </div>
+      <div class="header-actions">
+        <span id="saveStatus" class="status-pill">已本地保存</span>
+        <button id="resetBtn" type="button">重置</button>
+      </div>
+    </header>
+
+    <nav class="stepbar" aria-label="流程步骤">
+      <button class="step active" data-step="project">1 填写项目</button>
+      <button class="step" data-step="edit">2 编辑6张图</button>
+      <button class="step" data-step="export">3 预览导出</button>
+    </nav>
+
+    <main>
+      <section id="panel-project" class="screen active">
+        <div class="project-grid">
+          <section class="panel project-panel">
+            <div class="section-label">固定栏目输入</div>
+            <h2>上传图片，填写封面和 5 段正文</h2>
+            <p class="subtle">图 2-6 的小标题固定，但正文完全由你粘贴定稿；工具只负责排版和导出。</p>
+
+            <div class="form-section">
+              <div class="section-label">基础信息</div>
+              <label>封面标题<input id="coverTitle" type="text" placeholder="一个地方真正迷人的地方" /></label>
+              <label>封面副标题<input id="coverSubtitle" type="text" placeholder="普通读者书店 | 杭州" /></label>
+              <label>项目名称<input id="projectName" type="text" placeholder="普通读者书店" /></label>
+              <label>地点<input id="city" type="text" placeholder="杭州" /></label>
+              <label>
+                底部栏目标签
+                <select id="footerLabel">
+                  <option>城市生活方式观察</option>
+                  <option>松弛体验指南</option>
+                  <option>文化活动体验</option>
+                  <option>空间与品牌观察</option>
+                  <option>乡野生活方式观察</option>
+                  <option>微度假目的地观察</option>
+                </select>
+              </label>
+              <label>标签<input id="tags" type="text" placeholder="#杭州书店 #周末去哪儿 #松弛感" /></label>
+            </div>
+
+            <div class="form-section">
+              <div class="section-label">图片上传</div>
+              <label class="upload-button inline-upload">
+                <input id="coverImageInput" type="file" accept="image/*,.heic,.heif" />
+                <span id="coverUploadLabel">上传封面图</span>
+              </label>
+              <label class="upload-button inline-upload">
+                <input id="innerImagesInput" type="file" accept="image/*,.heic,.heif" multiple />
+                <span id="innerUploadLabel">上传内页图片，最多 5 张</span>
+              </label>
+            </div>
+
+            <div class="form-section">
+              <div class="section-label">封面样式</div>
+              <label>
+                封面蒙版
+                <select id="coverOverlayType">
+                  <option value="none">不加蒙版</option>
+                  <option value="black">黑色蒙版</option>
+                  <option value="gradient" selected>渐变蒙版</option>
+                </select>
+              </label>
+              <div id="overlayControls">
+                <label>蒙版强度 <input id="coverOverlayOpacity" type="range" min="0.1" max="0.8" step="0.05" value="0.35" /></label>
+                <label>
+                  渐变方向
+                  <select id="coverGradientDirection">
+                    <option value="top">从上到下</option>
+                    <option value="bottom" selected>从下到上</option>
+                    <option value="left">从左到右</option>
+                    <option value="right">从右到左</option>
+                  </select>
+                </label>
+              </div>
+            </div>
+
+            <div class="form-section">
+              <div class="section-label">内页正文</div>
+              <label>第一印象<textarea id="firstImpressionText" data-body-field rows="4" placeholder="请写这个地方给你的第一印象：你第一眼看到了什么？它的气质是什么？和普通空间有什么不同？"></textarea><span class="field-hint"></span></label>
+              <label>为什么想停留<textarea id="stayReasonText" data-body-field rows="4" placeholder="请写这个地方让人愿意停下来的具体原因：座位、光线、江边、宠物、咖啡、书、活动或人群。"></textarea><span class="field-hint"></span></label>
+              <label>建议这样逛<textarea id="experienceGuideText" data-body-field rows="4" placeholder="请写具体体验方法：什么时间去、从哪里开始、先看什么、哪里适合停留、怎么逛更舒服。"></textarea><span class="field-hint"></span></label>
+              <label>它好在哪里<textarea id="goodPointText" data-body-field rows="4" placeholder="请写你对这个地方的判断：它真正打动人的地方是什么？为什么值得被记住？"></textarea><span class="field-hint"></span></label>
+              <label>适合谁来<textarea id="suitablePeopleText" data-body-field rows="4" placeholder="请写适合什么样的人、心情、关系和场景，例如独处、朋友、情侣、亲子、宠物友好、周末放松。"></textarea><span class="field-hint"></span></label>
+            </div>
+
+            <button id="generateStructureBtn" class="primary wide" type="button">生成 6 张图</button>
+          </section>
+
+          <aside class="panel structure-panel">
+            <div class="section-label">固定结构</div>
+            <div id="structurePreview" class="structure-list"></div>
+          </aside>
+        </div>
+      </section>
+
+      <section id="panel-edit" class="screen">
+        <div class="editor-grid">
+          <aside class="slide-nav" id="slideNav"></aside>
+
+          <section class="preview-area">
+            <div class="preview-head">
+              <div>
+                <div class="section-label" id="currentSlideType">封面图</div>
+                <h2 id="currentSlideName">第 1 张</h2>
+              </div>
+              <button id="exportCurrentBtn" type="button">导出当前 PNG</button>
+            </div>
+            <div class="stage">
+              <div id="slidePreview" class="slide-preview"></div>
+            </div>
+          </section>
+
+          <aside class="panel edit-panel">
+            <div class="section-label">当前页面输入</div>
+            <div id="slideEditor"></div>
+          </aside>
+        </div>
+      </section>
+
+      <section id="panel-export" class="screen">
+        <div class="export-grid">
+          <section class="panel">
+            <div class="export-head">
+              <div>
+                <div class="section-label">导出预览</div>
+                <h2>检查 6 张图后导出</h2>
+              </div>
+              <button id="exportAllBtn" class="primary" type="button">导出全部 ZIP</button>
+            </div>
+            <div id="exportGrid" class="export-preview-grid"></div>
+          </section>
+        </div>
+      </section>
+    </main>
+
+    <script src="./app.js"></script>
+  </body>
+</html>
