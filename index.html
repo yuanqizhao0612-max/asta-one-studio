@@ -19,16 +19,23 @@
     </header>
 
     <nav class="stepbar" aria-label="流程步骤">
-      <button class="step active" data-step="project">1 填写项目</button>
-      <button class="step" data-step="edit">2 编辑6张图</button>
-      <button class="step" data-step="export">3 预览导出</button>
+      <div class="steps">
+        <button class="step active" data-step="project">1 填写项目</button>
+        <button class="step" data-step="edit">2 编辑6张图</button>
+        <button class="step" data-step="export">3 预览导出</button>
+      </div>
+      <div class="mode-switcher" role="group" aria-label="内容模式">
+        <span>内容模式</span>
+        <button type="button" data-mode="deep_project" class="active">项目深度体验</button>
+        <button type="button" data-mode="city_aesthetic_calendar">城市审美日历</button>
+      </div>
     </nav>
 
     <main>
       <section id="panel-project" class="screen active">
         <div class="project-grid">
           <section class="panel project-panel">
-            <div class="section-label">固定栏目输入</div>
+            <div class="section-label">固定栏目输入 · <span id="modeName">项目深度体验</span></div>
             <h2>上传图片，填写封面和 5 段正文</h2>
             <p class="subtle">图 2-6 的小标题固定，但正文完全由你粘贴定稿；工具只负责排版和导出。</p>
 
@@ -47,6 +54,7 @@
                   <option>空间与品牌观察</option>
                   <option>乡野生活方式观察</option>
                   <option>微度假目的地观察</option>
+                  <option>城市审美日历</option>
                 </select>
               </label>
               <label>标签<input id="tags" type="text" placeholder="#杭州书店 #周末去哪儿 #松弛感" /></label>

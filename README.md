@@ -11,14 +11,12 @@ ASTA ONE Studio is a static 6-image layout tool for ASTA ONE content.
 - Choose a footer content label.
 - Export one PNG or a full ZIP package.
 
-## Fixed Structure
+## Content Modes
 
-1. Cover
-2. 第一印象
-3. 隐藏看点
-4. 体验指南
-5. 它好在哪里
-6. 适合谁来
+- 项目深度体验：封面、第一印象、隐藏看点、体验指南、它好在哪里、适合谁来
+- 城市审美日历：封面、本月审美方向、值得慢看的5个展、隐藏看点、观展方式、适合这样安排
+
+The two modes keep separate body copy in local browser storage.
 
 ## GitHub Pages
 

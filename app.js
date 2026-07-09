@@ -1,13 +1,31 @@
 const $ = (id) => document.getElementById(id);
 
-const FIXED_CARDS = [
-  { type: "cover", label: "封面图", fixedTitle: "封面图", fileName: "asta-one-01-cover.png" },
-  { type: "first_impression", label: "第一印象", fixedTitle: "第一印象", fileName: "asta-one-02-first-impression.png" },
-  { type: "hidden_point", label: "隐藏看点", fixedTitle: "隐藏看点", fileName: "asta-one-03-hidden-point.png" },
-  { type: "experience_guide", label: "体验指南", fixedTitle: "体验指南", fileName: "asta-one-04-experience-guide.png" },
-  { type: "what_is_good", label: "它好在哪里", fixedTitle: "它好在哪里", fileName: "asta-one-05-what-is-good.png" },
-  { type: "suitable_for", label: "适合谁来", fixedTitle: "适合谁来", fileName: "asta-one-06-suitable-for.png" },
-];
+const MODE_CONFIGS = {
+  deep_project: {
+    label: "项目深度体验",
+    cards: [
+      { type: "cover", label: "封面图", fixedTitle: "封面图", fileName: "asta-one-01-cover.png" },
+      { type: "first_impression", label: "第一印象", fixedTitle: "第一印象", fileName: "asta-one-02-first-impression.png" },
+      { type: "hidden_point", label: "隐藏看点", fixedTitle: "隐藏看点", fileName: "asta-one-03-hidden-point.png" },
+      { type: "experience_guide", label: "体验指南", fixedTitle: "体验指南", fileName: "asta-one-04-experience-guide.png" },
+      { type: "what_is_good", label: "它好在哪里", fixedTitle: "它好在哪里", fileName: "asta-one-05-what-is-good.png" },
+      { type: "suitable_for", label: "适合谁来", fixedTitle: "适合谁来", fileName: "asta-one-06-suitable-for.png" },
+    ],
+  },
+  city_aesthetic_calendar: {
+    label: "城市审美日历",
+    cards: [
+      { type: "cover", label: "封面图", fixedTitle: "封面图", fileName: "asta-one-calendar-01-cover.png" },
+      { type: "aesthetic_direction", label: "本月审美方向", fixedTitle: "本月审美方向", fileName: "asta-one-calendar-02-direction.png" },
+      { type: "slow_exhibitions", label: "值得慢看的5个展", fixedTitle: "值得慢看的5个展", fileName: "asta-one-calendar-03-exhibitions.png" },
+      { type: "calendar_hidden_point", label: "隐藏看点", fixedTitle: "隐藏看点", fileName: "asta-one-calendar-04-hidden-point.png" },
+      { type: "viewing_method", label: "观展方式", fixedTitle: "观展方式", fileName: "asta-one-calendar-05-viewing-method.png" },
+      { type: "schedule_for", label: "适合这样安排", fixedTitle: "适合这样安排", fileName: "asta-one-calendar-06-schedule.png" },
+    ],
+  },
+};
+
+const currentCards = () => MODE_CONFIGS[state?.mode || "deep_project"].cards;
 
 const BODY_FIELDS = [
   ["firstImpressionText", 1],
@@ -24,6 +42,7 @@ const FOOTER_LABELS = [
   "空间与品牌观察",
   "乡野生活方式观察",
   "微度假目的地观察",
+  "城市审美日历",
 ];
 
 const DEFAULT_BODIES = ["", "", "", "", "", ""];
@@ -42,11 +61,21 @@ const BODY_PLACEHOLDERS = {
   experience_guide: "请写具体体验方法：什么时间去、从哪里开始、先看什么、再去哪、哪里适合停留、拍照或放松。",
   what_is_good: "请写 ASTA ONE 的判断：这个项目真正好的地方是什么？它为什么值得被体验？它提供了怎样的生活方式？",
   suitable_for: "请写适合什么样的人、心情、关系和场景，也可以写不适合什么期待。",
+  aesthetic_direction: "请写这个月推荐内容的整体气质，例如这个月更适合慢慢看什么、整体推荐逻辑是什么。",
+  slow_exhibitions: "请写本月精选的 5 个展览，建议包含展览名称、场馆和展期。每个展控制在 2 行以内。",
+  calendar_hidden_point: "请写这期展览中普通观众不一定会注意到的看点，例如策展逻辑、艺术家故事、空间背景、观看角度。",
+  viewing_method: "请写建议如何安排观展顺序、半日路线、先看什么，或如何把观展和城市散步结合起来。",
+  schedule_for: "请写适合什么样的人、心情和安排方式，也可以写不需要赶很多展，如何更轻松地看。",
 };
 
 const EMPTY_BODY_PREVIEW = "正文待填写";
 
 let state = {
+  mode: "deep_project",
+  modeBodies: {
+    deep_project: ["", "", "", "", ""],
+    city_aesthetic_calendar: ["", "", "", "", ""],
+  },
   activeStep: "project",
   selectedIndex: 0,
   coverTitle: "",
@@ -61,8 +90,8 @@ let state = {
   slides: createDefaultSlides(),
 };
 
-function createDefaultSlides() {
-  return FIXED_CARDS.map((card, index) => ({
+function createDefaultSlides(mode = "deep_project") {
+  return MODE_CONFIGS[mode].cards.map((card, index) => ({
     id: `slide-${index + 1}`,
     step: index + 1,
     type: card.type,
@@ -79,8 +108,8 @@ function createDefaultSlides() {
   }));
 }
 
-function normalizeSlides(slides) {
-  const defaults = createDefaultSlides();
+function normalizeSlides(slides, mode = "deep_project") {
+  const defaults = createDefaultSlides(mode);
   return defaults.map((base, index) => {
     const previous = slides?.[index] || {};
     const migratedTitle = TITLE_MIGRATION_MAP[previous.fixedTitle] || TITLE_MIGRATION_MAP[previous.label] || TITLE_MIGRATION_MAP[previous.title];
@@ -113,6 +142,7 @@ function stableTextHash(text) {
 
 function saveState() {
   try {
+    state.modeBodies[state.mode] = state.slides.slice(1).map((slide) => slide.body || "");
     localStorage.setItem("asta-one-studio-v2", JSON.stringify(state));
     $("saveStatus").textContent = "已本地保存";
   } catch {
@@ -125,7 +155,19 @@ function restoreState() {
   if (saved) {
     try {
       const parsed = JSON.parse(saved);
-      state = { ...state, ...parsed, slides: normalizeSlides(parsed.slides) };
+      const mode = MODE_CONFIGS[parsed.mode] ? parsed.mode : "deep_project";
+      const restoredSlides = normalizeSlides(parsed.slides, mode);
+      const restoredBodies = restoredSlides.slice(1).map((slide) => slide.body || "");
+      state = {
+        ...state,
+        ...parsed,
+        mode,
+        modeBodies: {
+          deep_project: parsed.modeBodies?.deep_project || (mode === "deep_project" ? restoredBodies : ["", "", "", "", ""]),
+          city_aesthetic_calendar: parsed.modeBodies?.city_aesthetic_calendar || (mode === "city_aesthetic_calendar" ? restoredBodies : ["", "", "", "", ""]),
+        },
+        slides: restoredSlides,
+      };
     } catch {
       localStorage.removeItem("asta-one-studio-v2");
     }
@@ -144,6 +186,7 @@ function hydrateFields() {
   setValue("coverOverlayOpacity", state.coverOverlayOpacity);
   setValue("coverGradientDirection", state.coverGradientDirection);
   BODY_FIELDS.forEach(([id, slideIndex]) => setValue(id, state.slides[slideIndex].body));
+  updateModeUi();
   updateUploadLabels();
   updateBodyHints();
   updateOverlayControls();
@@ -195,13 +238,13 @@ function generateStructure() {
     $("coverTitle").focus();
     return;
   }
-  state.slides = normalizeSlides(state.slides);
+  state.slides = normalizeSlides(state.slides, state.mode);
   syncFields();
   switchStep("edit");
 }
 
 function renderStructurePreview() {
-  $("structurePreview").innerHTML = FIXED_CARDS.map((card, index) => `
+  $("structurePreview").innerHTML = currentCards().map((card, index) => `
     <article class="structure-item">
       <strong>${index + 1}. ${escapeHtml(card.label)}</strong>
       <p>${index === 0 ? "主标题、副标题、项目名称、地点和封面图。" : "固定小标题，用户只填写正文内容。"}</p>
@@ -256,7 +299,11 @@ function slideHtml(slide) {
       </article>
     `;
   }
-  const layoutClass = hasImage ? "top-image" : "solid";
+  const isExhibitionList = slide.type === "slow_exhibitions";
+  const layoutClass = `${hasImage ? "top-image" : "solid"} ${isExhibitionList ? "exhibition-card" : ""}`;
+  const bodyContent = isExhibitionList && slide.body
+    ? exhibitionListHtml(slide.body)
+    : escapeHtml(slide.body || EMPTY_BODY_PREVIEW);
   return `
     <article class="slide inner-card ${layoutClass}" style="background:${slide.backgroundColor}">
       ${hasImage ? `<div class="photo">${image}</div>` : ""}
@@ -264,12 +311,46 @@ function slideHtml(slide) {
         <div>
           <div class="card-kicker">ASTA ONE ${String(slide.step).padStart(2, "0")}</div>
           <div class="card-title-fixed">${escapeHtml(slide.fixedTitle)}</div>
-          <div class="card-body ${slide.body ? "" : "empty"}">${escapeHtml(slide.body || EMPTY_BODY_PREVIEW)}</div>
+          <div class="card-body ${slide.body ? "" : "empty"}">${bodyContent}</div>
         </div>
         <div class="slide-brand">ASTA ONE｜${escapeHtml(state.footerLabel || FOOTER_LABELS[0])}</div>
       </div>
     </article>
   `;
+}
+
+function parseExhibitions(text) {
+  const source = String(text || "").trim();
+  if (!source) return [];
+  const paragraphGroups = source.split(/\n\s*\n/).map((item) => item.trim()).filter(Boolean);
+  let groups = paragraphGroups.length > 1 ? paragraphGroups : source.split("\n").map((item) => item.trim()).filter(Boolean);
+  if (groups.length > 5) {
+    const merged = [];
+    for (const line of groups) {
+      if (/^(至\s*20\d{2}|20\d{2}[.\-/年]|展期|即日起|长期)/.test(line) && merged.length) {
+        merged[merged.length - 1] += `\n${line}`;
+      } else {
+        merged.push(line);
+      }
+    }
+    groups = merged;
+  }
+  return groups.slice(0, 5).map((item) => {
+    const [name, ...details] = item.split("｜");
+    return {
+      name: (name || item).trim(),
+      details: details.join("｜").trim(),
+    };
+  });
+}
+
+function exhibitionListHtml(text) {
+  return `<div class="exhibition-list">${parseExhibitions(text).map((item) => `
+    <div class="exhibition-item">
+      <strong>${escapeHtml(item.name)}</strong>
+      ${item.details ? `<span>${escapeHtml(item.details)}</span>` : ""}
+    </div>
+  `).join("")}</div>`;
 }
 
 function renderEditor() {
@@ -336,6 +417,7 @@ function renderExport() {
 }
 
 function renderAll() {
+  updateModeUi();
   renderStructurePreview();
   renderSlideNav();
   renderSlidePreview();
@@ -344,6 +426,62 @@ function renderAll() {
   updateOverlayControls();
   updateUploadLabels();
   updateBodyHints();
+}
+
+function updateModeUi() {
+  document.querySelectorAll("[data-mode]").forEach((button) => {
+    const active = button.dataset.mode === state.mode;
+    button.classList.toggle("active", active);
+    button.setAttribute("aria-pressed", String(active));
+  });
+  const cards = currentCards();
+  BODY_FIELDS.forEach(([id, slideIndex]) => {
+    const field = $(id);
+    const card = cards[slideIndex];
+    if (!field || !card) return;
+    const label = field.closest("label");
+    if (label) label.childNodes[0].nodeValue = card.label;
+    field.placeholder = BODY_PLACEHOLDERS[card.type] || "";
+  });
+  const calendarMode = state.mode === "city_aesthetic_calendar";
+  const coverTitle = $("coverTitle");
+  const coverSubtitle = $("coverSubtitle");
+  const projectName = $("projectName");
+  const city = $("city");
+  if (coverTitle) coverTitle.placeholder = calendarMode ? "上海7月" : "一个地方真正迷人的地方";
+  if (coverSubtitle) coverSubtitle.placeholder = calendarMode ? "去看一点让人慢下来的展" : "普通读者书店 | 杭州";
+  if (projectName) {
+    projectName.placeholder = calendarMode ? "上海7月展览预告" : "普通读者书店";
+    projectName.closest("label").childNodes[0].nodeValue = calendarMode ? "栏目主题" : "项目名称";
+  }
+  if (city) {
+    city.placeholder = calendarMode ? "上海 / 7月" : "杭州";
+    city.closest("label").childNodes[0].nodeValue = calendarMode ? "城市 / 月份" : "地点";
+  }
+  if ($("modeName")) $("modeName").textContent = MODE_CONFIGS[state.mode].label;
+}
+
+function switchMode(nextMode) {
+  if (!MODE_CONFIGS[nextMode] || nextMode === state.mode) return;
+  syncFields();
+  state.modeBodies[state.mode] = state.slides.slice(1).map((slide) => slide.body || "");
+  const sharedSlides = state.slides;
+  state.mode = nextMode;
+  state.slides = createDefaultSlides(nextMode).map((slide, index) => ({
+    ...slide,
+    imageDataUrl: sharedSlides[index]?.imageDataUrl || "",
+    imageName: sharedSlides[index]?.imageName || "",
+    imageInfo: sharedSlides[index]?.imageInfo,
+    imagePositionX: sharedSlides[index]?.imagePositionX ?? 50,
+    imagePositionY: sharedSlides[index]?.imagePositionY ?? 50,
+    backgroundColor: sharedSlides[index]?.backgroundColor || slide.backgroundColor,
+    title: index === 0 ? sharedSlides[0]?.title || slide.title : slide.fixedTitle,
+    subtitle: index === 0 ? sharedSlides[0]?.subtitle || "" : "",
+    body: index === 0 ? "" : state.modeBodies[nextMode]?.[index - 1] || "",
+  }));
+  hydrateFields();
+  renderAll();
+  saveState();
 }
 
 function updateSelected(patch) {
@@ -553,27 +691,48 @@ async function renderSlideToCanvas(slide) {
   }
 
   const hasImage = Boolean(img);
+  const isExhibitionList = slide.type === "slow_exhibitions";
   if (hasImage) {
-    const imageHeight = 640;
+    const imageHeight = isExhibitionList ? 500 : 640;
     drawCoverImage(ctx, img, 0, 0, canvas.width, imageHeight, slide.imagePositionX, slide.imagePositionY);
     ctx.fillStyle = slide.backgroundColor || "#FFFFFF";
     ctx.fillRect(0, imageHeight, canvas.width, canvas.height - imageHeight);
   }
 
-  const top = hasImage ? 760 : 300;
+  const top = hasImage ? (isExhibitionList ? 590 : 760) : 300;
   ctx.fillStyle = "#777777";
   ctx.font = "400 28px -apple-system, BlinkMacSystemFont, PingFang SC";
   ctx.fillText(`ASTA ONE ${String(slide.step).padStart(2, "0")}`, padding, top);
   ctx.fillStyle = "#111111";
   ctx.font = "600 52px -apple-system, BlinkMacSystemFont, PingFang SC";
   const bodyStart = drawWrappedText(ctx, slide.fixedTitle, padding, top + 78, 860, 62, 2) + 48;
-  ctx.fillStyle = "#2B2B2B";
-  ctx.font = "400 34px -apple-system, BlinkMacSystemFont, PingFang SC";
-  drawWrappedText(ctx, slide.body, padding, bodyStart, 860, 56, hasImage ? 7 : 10);
+  if (isExhibitionList) {
+    drawExhibitionList(ctx, slide.body, padding, bodyStart, 860, hasImage ? 5 : 5);
+  } else {
+    ctx.fillStyle = "#2B2B2B";
+    ctx.font = "400 34px -apple-system, BlinkMacSystemFont, PingFang SC";
+    drawWrappedText(ctx, slide.body, padding, bodyStart, 860, 56, hasImage ? 7 : 10);
+  }
   ctx.fillStyle = "#111111";
   ctx.font = "700 28px -apple-system, BlinkMacSystemFont, PingFang SC";
   ctx.fillText(`ASTA ONE｜${state.footerLabel || FOOTER_LABELS[0]}`, padding, 1340);
   return canvas;
+}
+
+function drawExhibitionList(ctx, text, x, y, maxWidth, maxItems = 5) {
+  const items = parseExhibitions(text).slice(0, maxItems);
+  let cursorY = y;
+  for (const item of items) {
+    ctx.fillStyle = "#171717";
+    ctx.font = "600 32px -apple-system, BlinkMacSystemFont, PingFang SC";
+    cursorY = drawWrappedText(ctx, item.name, x, cursorY, maxWidth, 40, 1);
+    if (item.details) {
+      ctx.fillStyle = "#555555";
+      ctx.font = "400 26px -apple-system, BlinkMacSystemFont, PingFang SC";
+      cursorY = drawWrappedText(ctx, item.details, x, cursorY + 2, maxWidth, 34, 2);
+    }
+    cursorY += 18;
+  }
 }
 
 function canvasToBlob(canvas) {
@@ -588,7 +747,7 @@ async function downloadCurrent() {
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.href = url;
-  link.download = FIXED_CARDS[state.selectedIndex].fileName;
+  link.download = currentCards()[state.selectedIndex].fileName;
   link.click();
   URL.revokeObjectURL(url);
 }
@@ -638,7 +797,7 @@ async function exportAll() {
   const files = [];
   for (let index = 0; index < state.slides.length; index++) {
     const canvas = await renderSlideToCanvas(state.slides[index]);
-    files.push({ name: FIXED_CARDS[index].fileName, blob: await canvasToBlob(canvas) });
+    files.push({ name: currentCards()[index].fileName, blob: await canvasToBlob(canvas) });
   }
   const zip = await createZip(files);
   const url = URL.createObjectURL(zip);
@@ -652,6 +811,11 @@ async function exportAll() {
 function resetAll() {
   localStorage.removeItem("asta-one-studio-v2");
   state = {
+    mode: "deep_project",
+    modeBodies: {
+      deep_project: ["", "", "", "", ""],
+      city_aesthetic_calendar: ["", "", "", "", ""],
+    },
     activeStep: "project",
     selectedIndex: 0,
     coverTitle: "",
@@ -687,6 +851,9 @@ function escapeAttr(value) {
 }
 
 document.addEventListener("click", async (event) => {
+  const mode = event.target.closest("[data-mode]")?.dataset.mode;
+  if (mode) switchMode(mode);
+
   const step = event.target.closest("[data-step]")?.dataset.step;
   if (step) switchStep(step);
 

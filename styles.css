@@ -140,8 +140,9 @@ p {
 }
 
 .stepbar {
-  height: 58px;
+  min-height: 58px;
   display: flex;
+  justify-content: space-between;
   gap: 8px;
   align-items: center;
   padding: 0 32px;
@@ -151,6 +152,41 @@ p {
   position: sticky;
   top: 86px;
   z-index: 9;
+}
+
+.steps,
+.mode-switcher {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.mode-switcher {
+  padding: 4px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: #fff;
+}
+
+.mode-switcher > span {
+  padding: 0 8px;
+  color: var(--muted);
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.mode-switcher button {
+  min-height: 34px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  padding: 0 12px;
+  font-size: 13px;
+}
+
+.mode-switcher button.active {
+  background: var(--ink);
+  color: #fff;
 }
 
 .step {
@@ -505,6 +541,57 @@ p {
   color: #9a9a9f;
 }
 
+.slide.exhibition-card.top-image {
+  grid-template-rows: 42% 58%;
+}
+
+.slide.exhibition-card.top-image .slide-content {
+  padding-block: 5.5%;
+}
+
+.slide.exhibition-card .card-kicker {
+  margin-bottom: 10px;
+}
+
+.slide.exhibition-card .card-title-fixed {
+  margin-bottom: 14px;
+  font-size: clamp(20px, 2.2vw, 32px);
+}
+
+.exhibition-list {
+  display: grid;
+  gap: clamp(7px, 1vw, 14px);
+}
+
+.exhibition-item {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.exhibition-item strong,
+.exhibition-item span {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  white-space: pre-wrap;
+}
+
+.exhibition-item strong {
+  color: #171717;
+  font-size: clamp(12px, 1.28vw, 18px);
+  line-height: 1.25;
+  font-weight: 650;
+  -webkit-line-clamp: 1;
+}
+
+.exhibition-item span {
+  color: #555;
+  font-size: clamp(10px, 1.05vw, 15px);
+  line-height: 1.3;
+  -webkit-line-clamp: 2;
+}
+
 .slide.inner-card.solid .card-body {
   -webkit-line-clamp: 9;
 }
@@ -648,6 +735,27 @@ input[type="range"] {
 }
 
 @media (max-width: 760px) {
+  .stepbar {
+    align-items: stretch;
+    flex-direction: column;
+    height: auto;
+    padding-block: 8px;
+  }
+
+  .steps,
+  .mode-switcher {
+    width: 100%;
+    overflow-x: auto;
+  }
+
+  .mode-switcher {
+    justify-content: flex-start;
+  }
+
+  .mode-switcher button {
+    white-space: nowrap;
+  }
+
   body {
     min-width: 0;
   }
