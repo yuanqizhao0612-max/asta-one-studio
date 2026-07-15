@@ -3,158 +3,138 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>ASTA ONE 6图排版器</title>
+    <title>ASTA ONE 6图排版器 2.0</title>
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
     <header class="app-header">
-      <div>
-        <div class="brand">ASTA ONE Studio</div>
-        <h1>6图标准化排版器</h1>
+      <div class="brand-block">
+        <span class="brand-kicker">ASTA ONE</span>
+        <div>
+          <h1>6图排版器 2.0</h1>
+          <p>全球 AI 机会翻译站 · 1242 × 1660 px</p>
+        </div>
       </div>
       <div class="header-actions">
-        <span id="saveStatus" class="status-pill">已本地保存</span>
-        <button id="resetBtn" type="button">重置</button>
+        <span id="saveStatus" class="save-status">已自动保存</span>
+        <button id="newProjectBtn" class="quiet" type="button">新建</button>
+        <button id="duplicateProjectBtn" class="quiet" type="button">另存为</button>
+        <button id="previewAllBtn" type="button">预览全部</button>
+        <button id="exportAllBtn" class="primary" type="button">导出全部</button>
       </div>
     </header>
 
-    <nav class="stepbar" aria-label="流程步骤">
-      <div class="steps">
-        <button class="step active" data-step="project">1 填写项目</button>
-        <button class="step" data-step="edit">2 编辑6张图</button>
-        <button class="step" data-step="export">3 预览导出</button>
-      </div>
-      <div class="mode-switcher" role="group" aria-label="内容模式">
-        <span>内容模式</span>
-        <button type="button" data-mode="deep_project" class="active">项目深度体验</button>
-        <button type="button" data-mode="city_aesthetic_calendar">城市审美日历</button>
-      </div>
-    </nav>
+    <main class="workbench">
+      <aside class="page-rail" aria-label="六图页面导航">
+        <div class="rail-heading">
+          <span>页面</span>
+          <button id="projectSettingsBtn" class="text-button" type="button">项目设置</button>
+        </div>
+        <div id="pageNav" class="page-nav"></div>
+      </aside>
 
-    <main>
-      <section id="panel-project" class="screen active">
-        <div class="project-grid">
-          <section class="panel project-panel">
-            <div class="section-label">固定栏目输入 · <span id="modeName">项目深度体验</span></div>
-            <h2>上传图片，填写封面和 5 段正文</h2>
-            <p class="subtle">图 2-6 的小标题固定，但正文完全由你粘贴定稿；工具只负责排版和导出。</p>
-
-            <div class="form-section">
-              <div class="section-label">基础信息</div>
-              <label>封面标题<input id="coverTitle" type="text" placeholder="一个地方真正迷人的地方" /></label>
-              <label>封面副标题<input id="coverSubtitle" type="text" placeholder="普通读者书店 | 杭州" /></label>
-              <label>项目名称<input id="projectName" type="text" placeholder="普通读者书店" /></label>
-              <label>地点<input id="city" type="text" placeholder="杭州" /></label>
-              <label>
-                底部栏目标签
-                <select id="footerLabel">
-                  <option>城市生活方式观察</option>
-                  <option>松弛体验指南</option>
-                  <option>文化活动体验</option>
-                  <option>空间与品牌观察</option>
-                  <option>乡野生活方式观察</option>
-                  <option>微度假目的地观察</option>
-                  <option>城市审美日历</option>
-                </select>
-              </label>
-              <label>标签<input id="tags" type="text" placeholder="#杭州书店 #周末去哪儿 #松弛感" /></label>
-            </div>
-
-            <div class="form-section">
-              <div class="section-label">图片上传</div>
-              <label class="upload-button inline-upload">
-                <input id="coverImageInput" type="file" accept="image/*,.heic,.heif" />
-                <span id="coverUploadLabel">上传封面图</span>
-              </label>
-              <label class="upload-button inline-upload">
-                <input id="innerImagesInput" type="file" accept="image/*,.heic,.heif" multiple />
-                <span id="innerUploadLabel">上传内页图片，最多 5 张</span>
-              </label>
-            </div>
-
-            <div class="form-section">
-              <div class="section-label">封面样式</div>
-              <label>
-                封面蒙版
-                <select id="coverOverlayType">
-                  <option value="none">不加蒙版</option>
-                  <option value="black">黑色蒙版</option>
-                  <option value="gradient" selected>渐变蒙版</option>
-                </select>
-              </label>
-              <div id="overlayControls">
-                <label>蒙版强度 <input id="coverOverlayOpacity" type="range" min="0.1" max="0.8" step="0.05" value="0.35" /></label>
-                <label>
-                  渐变方向
-                  <select id="coverGradientDirection">
-                    <option value="top">从上到下</option>
-                    <option value="bottom" selected>从下到上</option>
-                    <option value="left">从左到右</option>
-                    <option value="right">从右到左</option>
-                  </select>
-                </label>
-              </div>
-            </div>
-
-            <div class="form-section">
-              <div class="section-label">内页正文</div>
-              <label>第一印象<textarea id="firstImpressionText" data-body-field rows="4" placeholder="请写这个地方给你的第一印象：第一眼看到什么？空间气质是什么？和普通空间有什么不同？"></textarea><span class="field-hint"></span></label>
-              <label>隐藏看点<textarea id="stayReasonText" data-body-field rows="4" placeholder="请写普通游客容易忽略的背景、设计、历史或空间亮点，例如老建筑、设计理念、特殊细节、项目原始意图。"></textarea><span class="field-hint"></span></label>
-              <label>体验指南<textarea id="experienceGuideText" data-body-field rows="4" placeholder="请写具体体验方法：什么时间去、从哪里开始、先看什么、再去哪、哪里适合停留、拍照或放松。"></textarea><span class="field-hint"></span></label>
-              <label>它好在哪里<textarea id="goodPointText" data-body-field rows="4" placeholder="请写 ASTA ONE 的判断：这个项目真正好的地方是什么？它为什么值得被体验？它提供了怎样的生活方式？"></textarea><span class="field-hint"></span></label>
-              <label>适合谁来<textarea id="suitablePeopleText" data-body-field rows="4" placeholder="请写适合什么样的人、心情、关系和场景，也可以写不适合什么期待。"></textarea><span class="field-hint"></span></label>
-            </div>
-
-            <button id="generateStructureBtn" class="primary wide" type="button">生成 6 张图</button>
-          </section>
-
-          <aside class="panel structure-panel">
-            <div class="section-label">固定结构</div>
-            <div id="structurePreview" class="structure-list"></div>
-          </aside>
+      <section class="editor-column">
+        <div class="editor-heading">
+          <div>
+            <span id="editorEyebrow" class="eyebrow">图 01 · 封面</span>
+            <h2 id="editorTitle">编辑封面</h2>
+          </div>
+          <span id="pageState" class="page-state">未完成</span>
+        </div>
+        <form id="pageEditor" class="editor-form"></form>
+        <div class="editor-footer">
+          <button id="previousPageBtn" type="button">上一页</button>
+          <button id="nextPageBtn" type="button">下一页</button>
+          <span id="overflowSummary" class="overflow-summary"></span>
+          <button id="exportCurrentBtn" class="primary" type="button">导出当前页</button>
         </div>
       </section>
 
-      <section id="panel-edit" class="screen">
-        <div class="editor-grid">
-          <aside class="slide-nav" id="slideNav"></aside>
-
-          <section class="preview-area">
-            <div class="preview-head">
-              <div>
-                <div class="section-label" id="currentSlideType">封面图</div>
-                <h2 id="currentSlideName">第 1 张</h2>
-              </div>
-              <button id="exportCurrentBtn" type="button">导出当前 PNG</button>
-            </div>
-            <div class="stage">
-              <div id="slidePreview" class="slide-preview"></div>
-            </div>
-          </section>
-
-          <aside class="panel edit-panel">
-            <div class="section-label">当前页面输入</div>
-            <div id="slideEditor"></div>
-          </aside>
+      <section class="preview-column">
+        <div class="preview-toolbar">
+          <div>
+            <span class="eyebrow">实时预览</span>
+            <p>预览与 PNG 使用同一渲染画布</p>
+          </div>
+          <div class="preview-controls">
+            <label class="compact-select">缩放
+              <select id="previewScale">
+                <option value="0.24">24%</option>
+                <option value="0.30" selected>30%</option>
+                <option value="0.36">36%</option>
+                <option value="0.42">42%</option>
+              </select>
+            </label>
+            <label class="switch"><input id="showSafeArea" type="checkbox" /> <span>安全区</span></label>
+          </div>
         </div>
-      </section>
-
-      <section id="panel-export" class="screen">
-        <div class="export-grid">
-          <section class="panel">
-            <div class="export-head">
-              <div>
-                <div class="section-label">导出预览</div>
-                <h2>检查 6 张图后导出</h2>
-              </div>
-              <button id="exportAllBtn" class="primary" type="button">导出全部 ZIP</button>
-            </div>
-            <div id="exportGrid" class="export-preview-grid"></div>
-          </section>
+        <div id="previewStage" class="preview-stage">
+          <canvas id="previewCanvas" width="1242" height="1660" aria-label="当前页面预览"></canvas>
         </div>
+        <div id="previewNotice" class="preview-notice" role="status"></div>
       </section>
     </main>
 
+    <dialog id="projectDialog" class="project-dialog">
+      <form method="dialog" class="dialog-card">
+        <div class="dialog-heading">
+          <div><span class="eyebrow">项目设置</span><h2>当前项目</h2></div>
+          <button class="icon-button" value="cancel" aria-label="关闭" title="关闭" type="submit">×</button>
+        </div>
+        <div class="dialog-grid">
+          <label>项目名称 <input id="projectName" maxlength="40" placeholder="例如：AI 眼镜正在改变什么" /></label>
+          <label>内容栏目
+            <select id="category">
+              <option>海外AI新发现</option>
+              <option>AI赚钱样本</option>
+              <option>免费资源中文说明</option>
+              <option>AI工作流</option>
+              <option>自定义</option>
+            </select>
+          </label>
+          <label>版式模板
+            <select id="template">
+              <option value="minimal">模板A｜极简信息卡</option>
+              <option value="evidence">模板B｜截图增强型</option>
+              <option value="magazine">模板C｜轻科技杂志感</option>
+            </select>
+          </label>
+          <label>字号密度
+            <select id="density">
+              <option value="comfortable">舒适</option>
+              <option value="standard" selected>标准</option>
+              <option value="compact">紧凑</option>
+            </select>
+          </label>
+          <label>栏目小标签 <input id="columnLabel" maxlength="24" placeholder="例如：AI DISCOVERY" /></label>
+          <label>平台标签 <input id="platformLabel" maxlength="24" placeholder="例如：GitHub" /></label>
+          <label>内容日期 <input id="contentDate" type="date" /></label>
+          <label>来源链接（仅内部保存） <input id="sourceUrl" type="url" placeholder="https://..." /></label>
+          <label class="wide-field">作者备注（不展示） <textarea id="authorNote" rows="3" placeholder="记录选题背景或发布提醒"></textarea></label>
+        </div>
+        <div class="dialog-switches">
+          <label class="switch"><input id="showBrand" type="checkbox" checked /> <span>显示 ASTA ONE｜人类生活说明书</span></label>
+          <label class="switch"><input id="showSources" type="checkbox" checked /> <span>显示来源信息</span></label>
+          <label class="switch"><input id="showTags" type="checkbox" checked /> <span>显示标签</span></label>
+        </div>
+        <div class="dialog-actions"><button value="cancel" type="submit">取消</button><button id="saveProjectSettingsBtn" class="primary" value="default" type="button">保存设置</button></div>
+      </form>
+    </dialog>
+
+    <dialog id="overviewDialog" class="overview-dialog">
+      <div class="overview-card">
+        <div class="dialog-heading">
+          <div><span class="eyebrow">导出前检查</span><h2 id="overviewTitle">六图总览</h2></div>
+          <button id="closeOverviewBtn" class="icon-button" aria-label="关闭" title="关闭" type="button">×</button>
+        </div>
+        <div id="overviewIssues" class="overview-issues"></div>
+        <div id="overviewGrid" class="overview-grid"></div>
+        <div class="dialog-actions"><button id="backToEditBtn" type="button">返回编辑</button><button id="overviewExportBtn" class="primary" type="button">导出全部 PNG</button></div>
+      </div>
+    </dialog>
+
+    <div id="toast" class="toast" role="status"></div>
+    <script src="./media-frame.js"></script>
     <script src="./app.js"></script>
   </body>
 </html>
